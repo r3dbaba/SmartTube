@@ -1195,6 +1195,40 @@ public class AppDialogUtil {
         void onClick(Video item);
     }
 
+    private static void showReorderDialog(Context context, int currentIndex, Runnable onFinish) {
+        AppDialogPresenter dialog = AppDialogPresenter.instance(context);
+        Playlist playlist = Playlist.instance();
+        List<Video> allVideos = playlist.getAll();
+        List<OptionItem> options = new ArrayList<>();
+
+        int size = allVideos.size();
+        int counter = 0;
+
+        final Video currentVideo = allVideos.get(currentIndex);
+
+        for (int i = 0; i < size; i++) {
+            Video item = allVideos.get(i);
+
+            final int index = i;
+            options.add(UiOptionItem.from((counter + 1) + " " + item.getTitle(), optionItem -> {
+                if (optionItem.isSelected()) {
+                    playlist.move(index, currentVideo);
+                    dialog.goBack();
+
+                    if (onFinish != null) {
+                        onFinish.run();
+                    }
+                }
+            }, index == currentIndex));
+            counter++;
+        }
+
+        String itemName = allVideos.get(currentIndex).getTitle();
+        dialog.appendRadioCategory(context.getString(com.liskovsoft.smartyoutubetv2.common.R.string.item_postion) + " " + itemName, options);
+
+        dialog.showDialog();
+    }
+
     public static void showPlaybackQueueDialog(Context context, OnVideoClick onClick) {
         String playbackQueueCategoryTitle = context.getString(R.string.playback_queue_category_title);
 
@@ -1214,6 +1248,13 @@ public class AppDialogUtil {
                         video.fromQueue = true;
                         onClick.onClick(video);
                         settingsPresenter.closeDialog();
+                    },
+                    (optionItem, data) -> {
+                        showReorderDialog(context, (int) data, () -> {
+                            settingsPresenter.goBack();
+                            showPlaybackQueueDialog(context, onClick);
+                        });
+
                     },
                     video == playlist.getCurrent())
             );

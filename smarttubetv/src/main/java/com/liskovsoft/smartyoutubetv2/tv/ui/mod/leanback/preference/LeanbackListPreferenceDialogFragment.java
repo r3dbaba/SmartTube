@@ -36,6 +36,7 @@ import androidx.preference.MultiSelectListPreference;
 import androidx.recyclerview.widget.RecyclerView;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.PlaybackPresenter;
 import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
+import com.liskovsoft.smartyoutubetv2.tv.ui.dialogs.other.LongClickListPreference;
 import com.liskovsoft.smartyoutubetv2.tv.ui.mod.clickable.LinkifyCompat;
 import com.liskovsoft.smartyoutubetv2.tv.ui.mod.clickable.LinkifyCompat.LinkifyClickHandler;
 
@@ -223,7 +224,7 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
     }
 
     public class AdapterSingle extends RecyclerView.Adapter<ViewHolder>
-            implements ViewHolder.OnItemClickListener {
+            implements ViewHolder.OnItemClickListener, ViewHolder.OnItemLongClickListener {
 
         private final CharSequence[] mEntries;
         private final CharSequence[] mEntryValues;
@@ -242,7 +243,7 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             final View view = inflater.inflate(androidx.leanback.preference.R.layout.leanback_list_preference_item_single,
                     parent, false);
-            return new ViewHolder(view, this);
+            return new ViewHolder(view, this, this);
         }
 
         @Override
@@ -275,10 +276,31 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
             getFragmentManager().popBackStack();
             notifyDataSetChanged();
         }
+
+        @Override
+        public void onItemLongClick(ViewHolder viewHolder) {
+            final int index = viewHolder.getAdapterPosition();
+            if (index == RecyclerView.NO_POSITION) {
+                return;
+            }
+            final CharSequence entry = mEntryValues[index];
+            final LongClickListPreference preference = (LongClickListPreference) getPreference();
+            if (index >= 0 && preference != null) {
+                String value = mEntryValues[index].toString();
+                preference.callPreferenceLongClickListener(index);
+//                if (preference.callChangeListener(value)) {
+//                    preference.setValue(value);
+//                    mSelectedValue = entry;
+//                }
+            }
+
+            getFragmentManager().popBackStack();
+            notifyDataSetChanged();
+        }
     }
 
     public class AdapterMulti extends RecyclerView.Adapter<ViewHolder>
-            implements ViewHolder.OnItemClickListener {
+            implements ViewHolder.OnItemClickListener, ViewHolder.OnItemLongClickListener {
 
         private final CharSequence[] mEntries;
         private final CharSequence[] mEntryValues;
@@ -297,7 +319,7 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             final View view = inflater.inflate(androidx.leanback.preference.R.layout.leanback_list_preference_item_multi, parent,
                     false);
-            return new ViewHolder(view, this);
+            return new ViewHolder(view, this, this);
         }
 
         @Override
@@ -342,26 +364,38 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
 
             notifyDataSetChanged();
         }
+
+        @Override
+        public void onItemLongClick(ViewHolder viewHolder) {
+
+        }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         public interface OnItemClickListener {
             void onItemClick(ViewHolder viewHolder);
+        }
+
+        public interface OnItemLongClickListener {
+            void onItemLongClick(ViewHolder viewHolder);
         }
 
         private final Checkable mWidgetView;
         private final TextView mTitleView;
         private final ViewGroup mContainer;
         private final OnItemClickListener mListener;
+        private final OnItemLongClickListener mLongClickListener;
 
-        public ViewHolder(@NonNull View view, @NonNull OnItemClickListener listener) {
+        public ViewHolder(@NonNull View view, @NonNull OnItemClickListener listener, @NonNull OnItemLongClickListener longClickListener) {
             super(view);
             mWidgetView = (Checkable) view.findViewById(androidx.leanback.preference.R.id.button);
             mContainer = (ViewGroup) view.findViewById(androidx.leanback.preference.R.id.container);
             mTitleView = (TextView) view.findViewById(android.R.id.title);
             mContainer.setOnClickListener(this);
+            mContainer.setOnLongClickListener(this);
             mListener = listener;
+            mLongClickListener = longClickListener;
         }
 
         public Checkable getWidgetView() {
@@ -379,6 +413,12 @@ public class LeanbackListPreferenceDialogFragment extends LeanbackPreferenceDial
         @Override
         public void onClick(View v) {
             mListener.onItemClick(this);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            mLongClickListener.onItemLongClick(this);
+            return true;
         }
     }
 }

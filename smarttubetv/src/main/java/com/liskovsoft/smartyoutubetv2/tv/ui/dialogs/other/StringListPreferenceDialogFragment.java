@@ -59,7 +59,7 @@ public class StringListPreferenceDialogFragment extends LeanbackListPreferenceDi
             final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             final View view = inflater.inflate(R.layout.dialog_list_preference_item_multi, parent,
                     false);
-            return new ViewHolder(view, this);
+            return new ViewHolder(view, this, this);
         }
 
         @Override

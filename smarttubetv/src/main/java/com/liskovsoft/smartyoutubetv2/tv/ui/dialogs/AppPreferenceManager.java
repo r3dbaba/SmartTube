@@ -3,7 +3,6 @@ package com.liskovsoft.smartyoutubetv2.tv.ui.dialogs;
 import android.content.Context;
 import android.text.TextUtils;
 import androidx.preference.DialogPreference;
-import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreference;
@@ -14,6 +13,7 @@ import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
 import com.liskovsoft.smartyoutubetv2.tv.R;
 import com.liskovsoft.smartyoutubetv2.tv.ui.dialogs.other.ChatPreference;
 import com.liskovsoft.smartyoutubetv2.tv.ui.dialogs.other.CommentsPreference;
+import com.liskovsoft.smartyoutubetv2.tv.ui.dialogs.other.LongClickListPreference;
 import com.liskovsoft.smartyoutubetv2.tv.ui.dialogs.other.StringListPreference;
 
 import java.util.HashSet;
@@ -150,7 +150,7 @@ public class AppPreferenceManager {
     }
 
     public Preference createRadioListPreference(OptionCategory category) {
-        ListPreference pref = new ListPreference(mContext);
+        LongClickListPreference pref = new LongClickListPreference(mContext);
 
         initSingleSelectListPreference(category, pref);
 
@@ -165,7 +165,7 @@ public class AppPreferenceManager {
         return pref;
     }
 
-    private void initSingleSelectListPreference(OptionCategory category, ListPreference pref) {
+    private void initSingleSelectListPreference(OptionCategory category, LongClickListPreference pref) {
         initDialogPreference(category, pref);
 
         ListPreferenceData prefData = createListPreferenceData(category.options);
@@ -183,6 +183,10 @@ public class AppPreferenceManager {
             }
 
             return true;
+        });
+
+        pref.setOnPreferenceLongClickListener((preference, newValue) -> {
+            category.options.get((int) newValue).onLongClick(newValue);
         });
     }
 

@@ -97,5 +97,25 @@ public class RadioListPreferenceDialogFragment extends LeanbackListPreferenceDia
 
             notifyDataSetChanged();
         }
+
+        @Override
+        public void onItemLongClick(ViewHolder viewHolder) {
+            final int index = viewHolder.getAdapterPosition();
+            if (index == RecyclerView.NO_POSITION) {
+                return;
+            }
+            final CharSequence entry = mEntryValues[index];
+            final LongClickListPreference preference = (LongClickListPreference) getPreference();
+            if (index >= 0 && preference != null) {
+                String value = mEntryValues[index].toString();
+                preference.callPreferenceLongClickListener(index);
+//                if (preference.callChangeListener(value)) {
+//                    preference.setValue(value);
+//                    mSelectedValue = entry;
+//                }
+            }
+
+            notifyDataSetChanged();
+        }
     }
 }

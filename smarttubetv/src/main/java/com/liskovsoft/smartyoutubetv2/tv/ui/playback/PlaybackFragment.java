@@ -1445,6 +1445,23 @@ public class PlaybackFragment extends SeekModePlaybackFragment implements Playba
     }
 
     @Override
+    public void clearSuggestions(VideoGroup group) {
+        if (group == null) {
+            return;
+        }
+
+        VideoGroupObjectAdapter adapter = mVideoGroupAdapters.get(group.getId());
+        if (adapter != null) {
+            adapter.clear();
+            int position = getSuggestionsIndex(group);
+            if (position != -1) {
+                mVideoGroupAdapters.remove(group.getId());
+                mRowsAdapter.removeItems(position + SUGGESTIONS_START_INDEX, 1);
+            }
+        }
+    }
+
+    @Override
     public int getSuggestionsIndex(VideoGroup group) {
         if (mRowsAdapter == null) {
             Log.e(TAG, "Related videos row not initialized yet.");

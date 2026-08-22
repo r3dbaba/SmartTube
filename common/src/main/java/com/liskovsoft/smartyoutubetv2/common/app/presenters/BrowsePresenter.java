@@ -491,6 +491,9 @@ public class BrowsePresenter extends BasePresenter<BrowseView> implements Sectio
                             prependItem(newItem);
                         }
                     }
+                } else if (action == VideoMenuCallback.ACTION_CLEAR_QUEUE) {
+                    VideoGroup group = VideoGroup.playbackQueueGroupFrom(videoItem.copy(), getContext());
+                    removeAllItems(group);
                 }
             });
         }

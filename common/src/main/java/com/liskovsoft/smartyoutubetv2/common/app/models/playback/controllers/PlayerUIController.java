@@ -412,6 +412,9 @@ public class PlayerUIController extends BasePlayerController {
                     getPlayer().updateSuggestions(group);
                     getPlayer().setNextTitle(mSuggestionsController.getNext());
                 }
+            } else if (action == VideoMenuCallback.ACTION_CLEAR_QUEUE) {
+                VideoGroup group = VideoGroup.playbackQueueGroupFrom(videoItem.copy(), getContext());
+                getPlayer().clearSuggestions(group);
             }
         });
     }

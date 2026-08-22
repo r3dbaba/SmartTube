@@ -756,4 +756,5 @@
         <item quantity="one">%s second</item>
         <item quantity="other">%s seconds</item>
     </plurals>
+    <string name="clear_playback_queue">Clear playback queue</string>
 </resources>

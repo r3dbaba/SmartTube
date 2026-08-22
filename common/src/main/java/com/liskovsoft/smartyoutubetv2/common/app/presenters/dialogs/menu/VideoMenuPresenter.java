@@ -71,6 +71,7 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
     private boolean mIsOpenPlaylistButtonEnabled;
     private boolean mIsAddToPlaybackQueueButtonEnabled;
     private boolean mIsPlayNextButtonEnabled;
+    private boolean mIsClearPlaybackQueueButtonEnabled;
     private boolean mIsShowPlaybackQueueButtonEnabled;
     private boolean mIsOpenDescriptionButtonEnabled;
     private boolean mIsOpenCommentsButtonEnabled;
@@ -93,6 +94,7 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
         int ACTION_ADD_TO_QUEUE = 5;
         int ACTION_PLAY_NEXT = 6;
         int ACTION_REMOVE_AUTHOR = 7;
+        int ACTION_CLEAR_QUEUE = 8;
         void onItemAction(Video videoItem, int action);
     }
 
@@ -811,6 +813,30 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
                         }));
     }
 
+    private void appendClearPlaybackQueueButton() {
+        if (!mIsClearPlaybackQueueButtonEnabled) {
+            return;
+        }
+
+        Playlist playlist = Playlist.instance();
+
+        if (playlist.getAll().isEmpty()) {
+            return;
+        }
+
+        mDialogPresenter.appendSingleButton(
+                UiOptionItem.from(
+                        getContext().getString(R.string.clear_playback_queue),
+                        optionItem -> {
+                            playlist.clear();
+                            if (mCallback != null) {
+                                mCallback.onItemAction(mVideo, VideoMenuCallback.ACTION_CLEAR_QUEUE);
+                            }
+                            closeDialog();
+                            MessageHelpers.showMessage(getContext(), R.string.clear_playback_queue);
+                        }));
+    }
+
     private void appendShowPlaybackQueueButton() {
         if (!mIsShowPlaybackQueueButtonEnabled) {
             return;
@@ -970,6 +996,7 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
         mIsAddToPlaybackQueueButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_ADD_TO_QUEUE);
         mIsPlayNextButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_PLAY_NEXT);
         mIsAddToWatchLaterButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_ADD_TO_WATCH_LATER);
+        mIsClearPlaybackQueueButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_CLEAR_PLAYBACK_QUEUE);
         mIsAddToPlaylistButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_ADD_TO_PLAYLIST);
         mIsShareLinkButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_SHARE_LINK);
         mIsShareQRLinkButtonEnabled = mainUIData.isMenuItemEnabled(MainUIData.MENU_ITEM_SHARE_QR_LINK);
@@ -1013,6 +1040,7 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
         mMenuMapping.put(MainUIData.MENU_ITEM_PLAYLIST_ORDER, new MenuAction(this::appendPlaylistOrderButton, true));
         mMenuMapping.put(MainUIData.MENU_ITEM_ADD_TO_QUEUE, new MenuAction(() -> { appendAddToPlaybackQueueButton(); appendRemoveFromPlaybackQueueButton(); }, false));
         mMenuMapping.put(MainUIData.MENU_ITEM_PLAY_NEXT, new MenuAction(this::appendPlayNextButton, false));
+        mMenuMapping.put(MainUIData.MENU_ITEM_CLEAR_PLAYBACK_QUEUE, new MenuAction(this::appendClearPlaybackQueueButton, false));
         mMenuMapping.put(MainUIData.MENU_ITEM_SHOW_QUEUE, new MenuAction(this::appendShowPlaybackQueueButton, false));
         mMenuMapping.put(MainUIData.MENU_ITEM_OPEN_CHANNEL, new MenuAction(this::appendOpenChannelButton, false));
         mMenuMapping.put(MainUIData.MENU_ITEM_OPEN_PLAYLIST, new MenuAction(this::appendOpenPlaylistButton, false));

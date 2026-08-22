@@ -1,11 +1,14 @@
 package com.liskovsoft.smartyoutubetv2.common.app.models.data;
 
+import android.content.Context;
+
 import com.liskovsoft.mediaserviceinterfaces.data.ChapterItem;
 import com.liskovsoft.mediaserviceinterfaces.data.MediaGroup;
 import com.liskovsoft.mediaserviceinterfaces.data.MediaItem;
 import com.liskovsoft.sharedutils.helpers.Helpers;
 import com.liskovsoft.sharedutils.mylogger.Log;
 import com.liskovsoft.sharedutils.prefs.GlobalPreferences;
+import com.liskovsoft.smartyoutubetv2.common.R;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.service.VideoStateService;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.service.VideoStateService.State;
 import com.liskovsoft.smartyoutubetv2.common.prefs.BlockedChannelData;
@@ -168,6 +171,18 @@ public class VideoGroup {
         baseGroup.mAction = ACTION_APPEND;
 
         return baseGroup;
+    }
+
+    public static VideoGroup playbackQueueGroupFrom(Video item, Context context) {
+        String title = context.getString(R.string.action_playback_queue);
+        int id = title.hashCode();
+        VideoGroup group = new VideoGroup();
+        group.setId(id);
+        group.setTitle(title);
+        group.setPosition(0); // Playback queue is always first
+        group.setType(MediaGroup.TYPE_PLAYBACK_QUEUE);
+        group.add(item); // Also sets items group to this group
+        return group;
     }
 
     public static VideoGroup fromChapters(List<ChapterItem> chapters, String title) {

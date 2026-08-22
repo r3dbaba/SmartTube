@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
@@ -475,6 +476,21 @@ public class BrowsePresenter extends BasePresenter<BrowseView> implements Sectio
                     VideoMenuPresenter.instance(getContext()).closeDialog();
                 } else if (action == VideoMenuCallback.ACTION_REMOVE_AUTHOR) {
                     removeItemAuthor(videoItem);
+                } else if (action == VideoMenuCallback.ACTION_PLAY_NEXT || action == VideoMenuCallback.ACTION_ADD_TO_QUEUE) {
+                    if (getCurrentSection() != null && getCurrentSection().getTitle() != null
+                            && Objects.equals(getCurrentSection().getTitle(), getContext().getString(R.string.action_playback_queue))) {
+                        Video deleteItem = videoItem.copy();
+                        VideoGroup.playbackQueueGroupFrom(deleteItem, getContext());
+                        removeItem(deleteItem);
+
+                        Video newItem = videoItem.copy();
+                        VideoGroup.playbackQueueGroupFrom(newItem, getContext());
+                        if (action == VideoMenuCallback.ACTION_ADD_TO_QUEUE) {
+                            addItem(newItem);
+                        } else {
+                            prependItem(newItem);
+                        }
+                    }
                 }
             });
         }

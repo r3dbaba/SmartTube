@@ -835,6 +835,7 @@ public final class Video {
         video.nextMediaItem = nextMediaItem;
         video.shuffleMediaItem = shuffleMediaItem;
         video.durationMs = durationMs;
+        video.badge = badge;
 
         if (getGroup() != null) {
             video.setGroup(getGroup().copy()); // Needed for proper multi row fragments sync (row id == group id)

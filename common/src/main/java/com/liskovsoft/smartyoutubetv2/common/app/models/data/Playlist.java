@@ -89,6 +89,37 @@ public class Playlist {
         stripPrevItem();
     }
 
+    /**
+     * Moves a video to the specified position in the playlist.
+     * The video must already be in the playlist.
+     *
+     * @param index to move the video to.
+     * @param video to be moved to the specified position.
+     */
+    public void move(int index, Video video) {
+        if (Video.isEmpty(video)) {
+            return;
+        }
+
+        int currentIndex = mPlaylist.indexOf(video);
+
+        if (currentIndex < 0) {
+            return;
+        }
+
+        remove(video);
+        mPlaylist.add(index, video);
+
+        setCurrent(video);
+
+//        mCurrentIndex = -1;  //force user to select current video
+
+        // Try to maintain current position.
+//        if (index < mCurrentIndex) {
+//            mCurrentIndex++;
+//        }
+    }
+
     public void next(Video video) {
         if (Video.isEmpty(video)) {
             return;

@@ -398,13 +398,17 @@ public class PlayerUIController extends BasePlayerController {
             } else if (action == VideoMenuCallback.ACTION_ADD_TO_QUEUE
                     || action == VideoMenuCallback.ACTION_REMOVE_FROM_QUEUE
                     || action == VideoMenuCallback.ACTION_PLAY_NEXT) {
+                // Remove if already in queue
+                VideoGroup deleteGroup = VideoGroup.playbackQueueGroupFrom(videoItem.copy(), getContext());
+                getPlayer().removeSuggestions(deleteGroup);
+
                 VideoGroup group = VideoGroup.playbackQueueGroupFrom(videoItem.copy(), getContext());
                 if (action == VideoMenuCallback.ACTION_PLAY_NEXT) {
                     group.setAction(VideoGroup.ACTION_PREPEND);
                 }
-                if (action == VideoMenuCallback.ACTION_REMOVE_FROM_QUEUE) {
-                    getPlayer().removeSuggestions(group);
-                } else {
+
+                // Only add if intent wasn't to remove
+                if (action != VideoMenuCallback.ACTION_REMOVE_FROM_QUEUE) {
                     getPlayer().updateSuggestions(group);
                     getPlayer().setNextTitle(mSuggestionsController.getNext());
                 }

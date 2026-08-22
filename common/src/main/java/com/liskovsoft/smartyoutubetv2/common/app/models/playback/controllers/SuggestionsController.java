@@ -465,12 +465,21 @@ public class SuggestionsController extends BasePlayerController {
         Playlist playlist = Playlist.instance();
 
         if (playlist.hasNext()) {
-            List<Video> queue = playlist.getAllAfterCurrent();
+            List<Video> queue = new ArrayList<>();
 
-            VideoGroup videoGroup = VideoGroup.from(queue);
-            videoGroup.setTitle(getContext().getString(R.string.action_playback_queue));
-            videoGroup.setId(videoGroup.getTitle().hashCode());
-            videoGroup.setType(MediaGroup.TYPE_PLAYBACK_QUEUE);
+            for (Video video : playlist.getAllAfterCurrent()) {
+                queue.add(video.copy());
+            }
+
+            VideoGroup videoGroup = null;
+
+            for (Video video : queue) {
+                if (videoGroup == null) {
+                    videoGroup = VideoGroup.playbackQueueGroupFrom(video, getContext());
+                    continue;
+                }
+                videoGroup.add(video);
+            }
 
             getPlayer().updateSuggestions(videoGroup);
         }
@@ -548,7 +557,7 @@ public class SuggestionsController extends BasePlayerController {
 
     private void appendChaptersIfNeeded(MediaItemMetadata mediaItemMetadata) {
         mChapters = mediaItemMetadata.getChapters();
-        
+
         addChapterMarkersIfNeeded();
         appendChapterSuggestionsIfNeeded();
         startChapterNotificationServiceIfNeeded();

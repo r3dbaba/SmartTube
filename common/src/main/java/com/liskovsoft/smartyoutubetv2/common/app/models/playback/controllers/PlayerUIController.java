@@ -7,7 +7,6 @@ import android.view.KeyEvent;
 import com.liskovsoft.googlecommon.common.helpers.ServiceHelper;
 import com.liskovsoft.mediaserviceinterfaces.MediaItemService;
 import com.liskovsoft.mediaserviceinterfaces.ServiceManager;
-import com.liskovsoft.mediaserviceinterfaces.data.MediaGroup;
 import com.liskovsoft.mediaserviceinterfaces.data.MediaItem;
 import com.liskovsoft.mediaserviceinterfaces.data.MediaItemMetadata;
 import com.liskovsoft.mediaserviceinterfaces.data.NotificationState;
@@ -399,14 +398,7 @@ public class PlayerUIController extends BasePlayerController {
             } else if (action == VideoMenuCallback.ACTION_ADD_TO_QUEUE
                     || action == VideoMenuCallback.ACTION_REMOVE_FROM_QUEUE
                     || action == VideoMenuCallback.ACTION_PLAY_NEXT) {
-                String title = getContext().getString(R.string.action_playback_queue);
-                int id = title.hashCode();
-                Video newItem = videoItem.copy();
-                VideoGroup group = VideoGroup.from(newItem, 0);
-                group.setTitle(title);
-                group.setId(id);
-                group.setType(MediaGroup.TYPE_PLAYBACK_QUEUE);
-                newItem.setGroup(group);
+                VideoGroup group = VideoGroup.playbackQueueGroupFrom(videoItem.copy(), getContext());
                 if (action == VideoMenuCallback.ACTION_PLAY_NEXT) {
                     group.setAction(VideoGroup.ACTION_PREPEND);
                 }

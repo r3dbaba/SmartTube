@@ -1,5 +1,8 @@
 package com.liskovsoft.smartyoutubetv2.common.app.models.data;
 
+import android.content.Context;
+import com.liskovsoft.sharedutils.helpers.Helpers;
+import com.liskovsoft.smartyoutubetv2.common.prefs.AppPrefs;
 import com.liskovsoft.smartyoutubetv2.common.utils.Utils;
 
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.List;
  * Manages a playlist of videos.
  */
 public class Playlist {
+    private static final String PLAYBACK_QUEUE_DATA = "playback_queue_data";
     private static final int LOW_RAM_PLAYLIST_MAX_SIZE = 50;
     private static final int HIGH_RAM_PLAYLIST_MAX_SIZE = 300;
     private final int mPlaylistMaxSize;
@@ -17,6 +21,8 @@ public class Playlist {
     private final List<Video> mSyncedItems;
     private int mCurrentIndex;
     private static Playlist sInstance;
+    private AppPrefs mPrefs;
+    private final Runnable mPersistStateInt = this::persistStateInt;
 
     private Playlist() {
         mPlaylist = new ArrayList<>();
@@ -26,11 +32,23 @@ public class Playlist {
     }
 
     public static Playlist instance() {
-        if (sInstance == null) {
-            sInstance = new Playlist();
-        }
-
         return sInstance;
+    }
+
+    public static Playlist instance(Context context) {
+        if (sInstance == null) {
+            sInstance =  new Playlist();
+            sInstance.initPrefs(context);
+        }
+        
+        return sInstance;
+    }
+
+    private void initPrefs(Context context) {
+        if (mPrefs == null && context != null) {
+            mPrefs = AppPrefs.instance(context.getApplicationContext());
+            restoreState();
+        }
     }
 
     /**
@@ -39,10 +57,12 @@ public class Playlist {
     public void clear() {
         mPlaylist.clear();
         mCurrentIndex = -1;
+        persistState();
     }
 
     public void clearPosition() {
         mCurrentIndex = -1;
+        persistState();
     }
 
     /**
@@ -51,6 +71,7 @@ public class Playlist {
     public void addAll(List<Video> videos) {
         mPlaylist.removeAll(videos);
         mPlaylist.addAll(videos);
+        persistState();
     }
 
     /**
@@ -69,6 +90,7 @@ public class Playlist {
         // And replace to correct position sync in fragments
         if (video.equals(current)) {
             replace(current, video);
+            persistState();
             return;
         }
 
@@ -87,6 +109,7 @@ public class Playlist {
         // In this case remove all next items.
         trimPlaylist();
         stripPrevItem();
+        persistState();
     }
 
     /**
@@ -118,6 +141,7 @@ public class Playlist {
 //        if (index < mCurrentIndex) {
 //            mCurrentIndex++;
 //        }
+        persistState();
     }
 
     public void next(Video video) {
@@ -140,6 +164,7 @@ public class Playlist {
         // In this case remove all next items.
         trimPlaylist();
         stripPrevItem();
+        persistState();
     }
 
     public void remove(Video video) {
@@ -170,6 +195,7 @@ public class Playlist {
             if (mCurrentIndex >= mPlaylist.size()) {
                 mCurrentIndex = mPlaylist.size() - 1;
             }
+            persistState();
         }
     }
 
@@ -252,6 +278,7 @@ public class Playlist {
             add(video);
             mCurrentIndex = mPlaylist.size() - 1;
         }
+        persistState();
     }
 
     public Video getCurrent() {
@@ -306,6 +333,7 @@ public class Playlist {
         if (fromIndex > 0 && fromIndex < size) {
             //mPlaylist = mPlaylist.subList(0, fromIndex);
             mPlaylist.subList(fromIndex, size).clear();
+            persistState();
         }
     }
 
@@ -320,6 +348,7 @@ public class Playlist {
             int toIndex = size - mPlaylistMaxSize;
             mPlaylist.subList(0, toIndex).clear();
             mCurrentIndex -= toIndex;
+            persistState();
         }
     }
 
@@ -374,5 +403,37 @@ public class Playlist {
         // Replace if exists. Item may be cloned.
         mSyncedItems.remove(origin);
         mSyncedItems.add(origin);
+        persistState();
+    }
+
+    private void restoreState() {
+        if (mPrefs == null) {
+            return;
+        }
+
+        String data = mPrefs.getData(PLAYBACK_QUEUE_DATA);
+        String[] split = Helpers.splitData(data);
+
+        if (split != null && split.length >= 2) {
+            mPlaylist.clear();
+            mPlaylist.addAll(Helpers.parseList(split, 0, Video::fromString));
+            mCurrentIndex = Helpers.parseInt(split, 1, -1);
+        }
+    }
+
+    public void persistNow() {
+        Utils.post(mPersistStateInt);
+    }
+
+    private void persistState() {
+        Utils.postDelayed(mPersistStateInt, 10_000);
+    }
+
+    private void persistStateInt() {
+        if (mPrefs == null) {
+            return;
+        }
+
+        mPrefs.setData(PLAYBACK_QUEUE_DATA, Helpers.mergeData(mPlaylist, mCurrentIndex));
     }
 }

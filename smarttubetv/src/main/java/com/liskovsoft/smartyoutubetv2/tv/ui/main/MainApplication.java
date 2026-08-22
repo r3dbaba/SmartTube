@@ -6,6 +6,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.liskovsoft.sharedutils.helpers.Helpers;
 import com.liskovsoft.smartyoutubetv2.common.app.models.data.BrowseSection;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Playlist;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.BrowsePresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.views.AddDeviceView;
 import com.liskovsoft.smartyoutubetv2.common.app.views.AppDialogView;
@@ -63,6 +64,9 @@ public class MainApplication extends MultiDexApplication { // fix: Didn't find c
         //if (Build.VERSION.SDK_INT < 29 && Conscrypt.isAvailable()) {
         //    Security.insertProviderAt(Conscrypt.newProvider(), 1);
         //}
+
+        // Give playlist a context so it can restore state
+        Playlist.instance(this.getApplicationContext());
 
         // Important: Initialize the native Conscrypt provider BEFORE reading any configs/SharedPreferences.
         // Otherwise, early disk I/O shifts the ClassLoader on some Android TV devices, causing silent JNI linking errors.

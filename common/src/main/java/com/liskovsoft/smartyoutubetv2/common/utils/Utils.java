@@ -69,6 +69,7 @@ import com.liskovsoft.sharedutils.mylogger.Log;
 import com.liskovsoft.sharedutils.okhttp.OkHttpManager;
 import com.liskovsoft.smartyoutubetv2.common.BuildConfig;
 import com.liskovsoft.smartyoutubetv2.common.R;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Playlist;
 import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.manager.PlayerConstants;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.manager.PlayerManager;
@@ -1345,6 +1346,7 @@ public class Utils {
         PlayerTweaksData.instance(context).persistNow();
         MainUIData.instance(context).persistNow();
         GeneralData.instance(context).persistNow();
+        Playlist.instance(context).persistNow();
         MediaServiceData mediaServiceData = MediaServiceData.instance();
         mediaServiceData.persistNow();
         BlockedChannelData.instance(context).persistNow();

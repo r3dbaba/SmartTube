@@ -151,7 +151,7 @@ public class VideoGridFragment extends GridFragment implements VideoSection {
         }
 
         // Smooth remove animation
-        if (action == VideoGroup.ACTION_REMOVE || action == VideoGroup.ACTION_REMOVE_AUTHOR) {
+        if (action == VideoGroup.ACTION_REMOVE || action == VideoGroup.ACTION_REMOVE_AUTHOR || action == VideoGroup.ACTION_PREPEND || action == VideoGroup.ACTION_APPEND) {
             updateInt(group);
             return;
         }
@@ -181,6 +181,9 @@ public class VideoGridFragment extends GridFragment implements VideoSection {
             return;
         } else if (action == VideoGroup.ACTION_SYNC) {
             mGridAdapter.sync(group);
+            return;
+        } else if (action == VideoGroup.ACTION_PREPEND) {
+            mGridAdapter.add(group);
             return;
         }
 

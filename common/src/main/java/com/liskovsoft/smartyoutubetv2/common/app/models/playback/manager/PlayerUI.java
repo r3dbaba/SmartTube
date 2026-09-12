@@ -14,6 +14,7 @@ public interface PlayerUI {
     void updateSuggestions(VideoGroup group);
     void removeSuggestions(VideoGroup group);
     void clearSuggestions(VideoGroup group);
+    void clearPreviousSuggestions(VideoGroup group);
     int getSuggestionsIndex(VideoGroup group);
     VideoGroup getSuggestionsByIndex(int index);
     void focusSuggestedItem(int index);

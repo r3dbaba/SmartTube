@@ -144,6 +144,13 @@ public abstract class BasePresenter<T> implements Presenter<T> {
         updateItem(Collections.singletonList(item), VideoGroup.ACTION_REMOVE);
     }
 
+    protected void removeItems(List<Video> items) {
+        if (items.isEmpty()) {
+            return;
+        }
+        updateItem(items, VideoGroup.ACTION_REMOVE);
+    }
+
     protected void removeAllItems(VideoGroup group) {
         T view = getView();
         group.clear(); // Ensure group is empty. Clearing is achieved by replacing existing items with empty list

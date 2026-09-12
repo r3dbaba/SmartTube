@@ -757,5 +757,8 @@
         <item quantity="other">%s seconds</item>
     </plurals>
     <string name="clear_playback_queue">Clear playback queue</string>
+    <string name="clear_previous_items_in_queue">Clear previous items in playback queue</string>
+    <string name="previous_items_cleared">Previous items cleared</string>
+    <string name="no_previous_items_to_clear">No previous items to clear</string>
     <string name="playback_queue_cleared">Playback queue cleared</string>
 </resources>

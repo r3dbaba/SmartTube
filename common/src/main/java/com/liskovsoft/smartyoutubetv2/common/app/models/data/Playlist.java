@@ -278,6 +278,30 @@ public class Playlist {
         }
     }
 
+    public boolean hasPrevious() {
+        return mCurrentIndex > 0;
+    }
+
+    /**
+     * Removes all items before the current one, keeping the current item and everything after it.
+     * After this call, {@code mCurrentIndex} will be 0.
+     */
+    public void removeAllBeforeCurrent() {
+        if (mCurrentIndex <= 0) {
+            return;
+        }
+
+        mPlaylist.subList(0, mCurrentIndex).clear();
+        mCurrentIndex = 0;
+    }
+
+    public List<Video> getPreviousItems() {
+        if (mCurrentIndex <= 0) {
+            return new ArrayList<>(0);
+        }
+        return new ArrayList<>(mPlaylist.subList(0, mCurrentIndex));
+    }
+
     /**
      * Trim playlist if one exceeds needed size or current element not last in the list
      */

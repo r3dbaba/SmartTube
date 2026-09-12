@@ -95,6 +95,7 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
         int ACTION_PLAY_NEXT = 6;
         int ACTION_REMOVE_AUTHOR = 7;
         int ACTION_CLEAR_QUEUE = 8;
+        int ACTION_CLEAR_PREVIOUS_QUEUE_ITEMS = 9;
         void onItemAction(Video videoItem, int action);
     }
 
@@ -824,17 +825,64 @@ public class VideoMenuPresenter extends BaseMenuPresenter {
             return;
         }
 
+        Context context = getContext();
+
         mDialogPresenter.appendSingleButton(
                 UiOptionItem.from(
-                        getContext().getString(R.string.clear_playback_queue),
+                        context.getString(R.string.clear_previous_items_in_queue),
+                        optionItem -> {
+                            if (!playlist.hasPrevious()) {
+                                MessageHelpers.showMessage(context, R.string.no_previous_items_to_clear);
+                                return;
+                            }
+                            playlist.removeAllBeforeCurrent();
+                            if (mCallback != null) {
+                                mCallback.onItemAction(mVideo, VideoMenuCallback.ACTION_CLEAR_PREVIOUS_QUEUE_ITEMS);
+                            }
+                            closeDialog();
+                            MessageHelpers.showMessage(context, R.string.previous_items_cleared);
+                        },
+                        (optionItem, data) -> {
+                            showClearQueueSubmenu(playlist);
+                        },
+                        false));
+    }
+
+    private void showClearQueueSubmenu(Playlist playlist) {
+        Context context = getContext();
+
+        mDialogPresenter.closeDialog();
+
+        mDialogPresenter.appendSingleButton(
+                UiOptionItem.from(
+                        context.getString(R.string.clear_previous_items_in_queue),
+                        optionItem -> {
+                            if (!playlist.hasPrevious()) {
+                                MessageHelpers.showMessage(context, R.string.no_previous_items_to_clear);
+                                mDialogPresenter.closeDialog();
+                                return;
+                            }
+                            playlist.removeAllBeforeCurrent();
+                            if (mCallback != null) {
+                                mCallback.onItemAction(mVideo, VideoMenuCallback.ACTION_CLEAR_PREVIOUS_QUEUE_ITEMS);
+                            }
+                            MessageHelpers.showMessage(context, R.string.previous_items_cleared);
+                            mDialogPresenter.closeDialog();
+                        }));
+
+        mDialogPresenter.appendSingleButton(
+                UiOptionItem.from(
+                        context.getString(R.string.clear_playback_queue),
                         optionItem -> {
                             playlist.clear();
                             if (mCallback != null) {
                                 mCallback.onItemAction(mVideo, VideoMenuCallback.ACTION_CLEAR_QUEUE);
                             }
-                            MessageHelpers.showMessage(getContext(), R.string.playback_queue_cleared);
-                            closeDialog();
+                            MessageHelpers.showMessage(context, R.string.playback_queue_cleared);
+                            mDialogPresenter.closeDialog();
                         }));
+
+        mDialogPresenter.showDialog(context.getString(R.string.clear_playback_queue));
     }
 
     private void appendShowPlaybackQueueButton() {

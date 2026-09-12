@@ -48,6 +48,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.liskovsoft.mediaserviceinterfaces.data.MediaItemFormatInfo;
 import com.liskovsoft.sharedutils.helpers.Helpers;
 import com.liskovsoft.sharedutils.mylogger.Log;
+import com.liskovsoft.smartyoutubetv2.common.app.models.data.Playlist;
 import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
 import com.liskovsoft.smartyoutubetv2.common.app.models.data.VideoGroup;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.manager.PlayerUI;
@@ -1458,6 +1459,43 @@ public class PlaybackFragment extends SeekModePlaybackFragment implements Playba
                 mVideoGroupAdapters.remove(group.getId());
                 mRowsAdapter.removeItems(position + SUGGESTIONS_START_INDEX, 1);
             }
+        }
+    }
+
+    @Override
+    public void clearPreviousSuggestions(VideoGroup group) {
+        if (group == null) {
+            return;
+        }
+
+        VideoGroupObjectAdapter adapter = mVideoGroupAdapters.get(group.getId());
+        if (adapter == null) {
+            return;
+        }
+
+        Video currentVideo = Playlist.instance().getCurrent();
+        if (currentVideo == null) {
+            return;
+        }
+
+        int currentIndex = adapter.indexOfAlt(currentVideo);
+        if (currentIndex <= 0) {
+            return;
+        }
+
+        // Remove all items before the current video
+        List<Video> previousItems = new java.util.ArrayList<>();
+        for (int i = 0; i < currentIndex; i++) {
+            Object item = adapter.get(i);
+            if (item instanceof Video) {
+                previousItems.add((Video) item);
+            }
+        }
+
+        if (!previousItems.isEmpty()) {
+            VideoGroup previousGroup = VideoGroup.from(previousItems);
+            previousGroup.setId(group.getId());
+            adapter.remove(previousGroup);
         }
     }
 

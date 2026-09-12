@@ -87,6 +87,11 @@ public class EmbedPlayerView extends PlayerView implements PlaybackView {
     }
 
     @Override
+    public void clearPreviousSuggestions(VideoGroup group) {
+
+    }
+
+    @Override
     public int getSuggestionsIndex(VideoGroup group) {
         return 0;
     }

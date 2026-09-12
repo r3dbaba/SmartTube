@@ -6,6 +6,7 @@ public interface OptionItem {
     CharSequence getDescription();
     boolean isSelected();
     void onSelect(boolean isSelected);
+    void onLongClick(Object data);
     Object getData();
     void setRequired(OptionItem... items);
     OptionItem[] getRequired();

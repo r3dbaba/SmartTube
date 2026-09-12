@@ -12,6 +12,7 @@ public class UiOptionItem implements OptionItem {
     private boolean mIsSelected;
     private FormatItem mFormat;
     private OptionCallback mCallback;
+    private OptionLongClickCallback mLongClickCallback;
     private Object mData;
     private OptionItem[] mRequiredItems;
     private OptionItem[] mRadioItems;
@@ -69,6 +70,12 @@ public class UiOptionItem implements OptionItem {
 
     public static OptionItem from(CharSequence title, OptionCallback callback, boolean isChecked) {
         return from(title, callback, isChecked, null);
+    }
+
+    public static OptionItem from(CharSequence title, OptionCallback callback, OptionLongClickCallback longClickCallback, boolean isChecked) {
+        UiOptionItem optionItem = (UiOptionItem)from(title, callback, isChecked, null);
+        optionItem.mLongClickCallback = longClickCallback;
+        return optionItem;
     }
 
     public static OptionItem from(CharSequence title, CharSequence description, OptionCallback callback, boolean isChecked) {
@@ -141,6 +148,13 @@ public class UiOptionItem implements OptionItem {
 
         if (mCallback != null) {
             mCallback.onSelect(this);
+        }
+    }
+
+    @Override
+    public void onLongClick(Object data) {
+        if (mLongClickCallback != null) {
+            mLongClickCallback.onLongClick(this, data);
         }
     }
 
